@@ -1,0 +1,41 @@
+{
+	"name": "openid-provider",
+	"version": "1.0.0",
+	"description": "Simple OpenID provider",
+	"main": "service.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mharj/openid-provider.git"
+	},
+	"keywords": [
+		"openid"
+	],
+	"author": "Marko Harjula",
+	"license": "LGPL-2.1",
+	"bugs": {
+		"url": "https://github.com/mharj/openid-provider/issues"
+	},
+	"homepage": "https://github.com/mharj/openid-provider#readme",
+	"dependencies": {
+		"etag": "^1.8.1",
+		"express": "^4.16.2"
+	},
+	"prettier": {
+		"useTabs": true,
+		"singleQuote": true,
+		"bracketSpacing": false,
+		"arrowParens": "always",
+		"semi": true,
+		"trailingComma": "all",
+		"printWidth": 160
+	},
+	"devDependencies": {
+		"chai": "^4.1.2",
+		"chai-http": "^3.0.0",
+		"mocha": "^5.0.1",
+		"node-fetch": "^2.0.0"
+	}
+}
