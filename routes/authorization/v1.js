@@ -1,13 +1,15 @@
-const express = require('express');
-const router = express.Router();
+const cc = require('camelcase-keys');
+const {Router} = require('express');
 const querystring = require('querystring');
 const {getHttpBasicCredentials, checkPassword, getClient} = require('../../modules/auth');
+let router = new Router();
 
 function openIdError(req, res, error) {
-	if (req.query.state) {
-		error.state = req.query.state;
+	const {state, redirectUri} = cc(req.query);
+	if (state) {
+		error.state = state;
 	}
-	res.set('Location', req.query.redirect_uri + '?' + querystring.stringify(error));
+	res.set('Location', redirectUri + '?' + querystring.stringify(error));
 	res.status(302).end();
 }
 
@@ -19,7 +21,7 @@ function openId(req, res, next) {
 		}
 	});
 	if (required) {
-		const {redirect_uri, scope} = req.query;
+		const {redirectUri, scope} = cc(req.query);
 		// pre-checks - scope
 		let scopes = scope.split(' ').filter(function(n) {
 			return n != undefined;
@@ -30,7 +32,7 @@ function openId(req, res, next) {
 		}
 		// pre-checks - client
 		getClient(req.query.client_id).then((client) => {
-			if (client.redirectUris.indexOf(redirect_uri) === -1) {
+			if (client.redirectUris.indexOf(redirectUri) === -1) {
 				openIdError(req, res, {error: 'invalid_request_uri', error_description: 'Missing correct redirect url'});
 			} else {
 				next();

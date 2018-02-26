@@ -20,6 +20,7 @@
 	},
 	"homepage": "https://github.com/mharj/openid-provider#readme",
 	"dependencies": {
+		"camelcase-keys": "^4.2.0",
 		"etag": "^1.8.1",
 		"express": "^4.16.2"
 	},
