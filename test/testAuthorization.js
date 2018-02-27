@@ -22,12 +22,12 @@ function getConfig() {
 	return configCache
 		? Promise.resolve(configCache)
 		: chai
-				.request(service)
-				.get('/.well-known/openid-configuration')
-				.then((res) => {
-					configCache = res.body;
-					return Promise.resolve(configCache);
-				});
+			.request(service)
+			.get('/.well-known/openid-configuration')
+			.then((res) => {
+				configCache = res.body;
+				return Promise.resolve(configCache);
+			});
 }
 
 describe('authorization_endpoint', () => {
@@ -230,5 +230,5 @@ describe('authorization_endpoint', () => {
 					}
 				});
 		});
-	});	
+	});
 });
