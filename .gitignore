@@ -58,4 +58,5 @@ typings/
 .env
 
 # ignore cert Directory
-jwtcerts
+/jwtcerts/
+/test/jwtcerts/
