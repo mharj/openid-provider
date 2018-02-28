@@ -23,7 +23,6 @@ function openIdOk(req, res, data) {
 	res.status(302).end();
 }
 
-
 function openId(req, res, next) {
 	let required = true;
 	['scope', 'response_type', 'client_id', 'redirect_uri'].forEach((k) => {
@@ -37,7 +36,7 @@ function openId(req, res, next) {
 		let scopes = scope.split(' ').filter(function(n) {
 			return n != undefined;
 		});
-		if ( scopes.indexOf('openid') === -1 ) {
+		if (scopes.indexOf('openid') === -1) {
 			openIdError(req, res, {error: 'invalid_request_object', error_description: 'Broken OpenID scope'});
 			return;
 		}
@@ -63,16 +62,16 @@ router.get('/', openId, (req, res) => {
 		const {authorization} = req.headers;
 		const {username, password} = getHttpBasicCredentials(authorization);
 		checkPassword(username, password)
-			.then(() => {
+			.then((idPayload) => {
 				const {responseType} = cc(req.query);
 				let ses = new Session();
 				let payload = {session_state: ses.id};
-				if ( responseType == 'code' ) {
+				ses.set('id_payload', idPayload);
+				if (responseType == 'code') {
+					ses.set('code', ses.id);
 					payload.code = ses.id;
 				}
-//				res.set('Content-Type', 'application/json');
-//				res.send().end();
-				openIdOk(req, res, payload);
+				ses.save().then(() => openIdOk(req, res, payload));
 			})
 			.catch((err) => {
 				res.set('WWW-Authenticate', 'Basic realm="OpenID"');
@@ -88,7 +87,7 @@ router.get('/', openId, (req, res) => {
 router.post('/', openId, (req, res) => {
 	try {
 		const {username, password} = req.body;
-		checkPassword(username, password).then(() => {
+		checkPassword(username, password).then((idPayload) => {
 			res.set('Content-Type', 'application/json');
 			res.send().end();
 		});

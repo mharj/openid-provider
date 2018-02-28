@@ -5,6 +5,7 @@ const url = require('url');
 let chaiHttp = require('chai-http');
 const querystring = require('querystring');
 let servicePromise = require('../service');
+const {loadSessionData, getWithAuthCode} = require('../modules/auth');
 let service = null;
 chai.should();
 chai.use(chaiHttp);
@@ -121,7 +122,7 @@ describe('authorization_endpoint', () => {
 				});
 		});
 	});
-	it('it should auth with http basic', (done) => {
+	it('it should auth with http basic and get auth code', (done) => {
 		getConfig().then((config) => {
 			let urlData = url.parse(config['authorization_endpoint']);
 			chai
@@ -142,7 +143,13 @@ describe('authorization_endpoint', () => {
 						expect(data).to.have.property('session_state');
 						expect(data).to.have.property('code');
 						expect(data).to.have.property('state');
-						done();
+						loadSessionData() // compare data with backend
+							.then( () => getWithAuthCode(data.code) )
+							.then( (ses) => {
+								const code = ses.get('code');
+								expect(code).to.be.equal(data.code);
+								done();
+							});
 					} else {
 						done(err);
 					}
@@ -248,27 +255,6 @@ describe('authorization_endpoint', () => {
 					} else {
 						done(err);
 					}
-				});
-		});
-	});
-	it('test code flow', (done) => {
-		getConfig().then((config) => {
-			let urlData = url.parse(config['authorization_endpoint']);
-			let flowData = Object.assign({}, params, {response_type: 'code'});
-			chai
-				.request(service)
-				.post(urlData.path + '?' + querystring.stringify(flowData))
-				.redirects(0)
-				.type('json')
-				.send({
-					username: 'test',
-					password: 'test',
-				})
-				.then((res) => {
-					done();
-				})
-				.catch((err) => {
-					done(err);
 				});
 		});
 	});

@@ -27,10 +27,36 @@ module.exports.loadCerts = () => {
 							.createHash('md5')
 							.update(pubCert)
 							.digest('hex'),
-					})
+					}),
 				);
 			});
 			resolve();
+		});
+	});
+};
+module.exports.getPrivateCert = () => {
+	return new Promise((resolve, reject) => {
+		let path;
+		if (process.env.NODE_ENV === 'test') {
+			path = './test/jwtcerts/';
+		} else {
+			path = './jwtcerts/';
+		}
+		fs.readdir(path, (err, files) => {
+			// get first priv key (*.key)
+			const fileName = files.find((file) => file.match(/\.key$/));
+			const pubCert = fs.readFileSync(path + fileName + '.pub', 'ascii');
+			if (fileName) {
+				resolve({
+					cert: fs.readFileSync(path + fileName, 'ascii'),
+					kid: crypto
+						.createHash('md5')
+						.update(pubCert)
+						.digest('hex'),
+				});
+			} else {
+				reject(new Error('no cert found'));
+			}
 		});
 	});
 };

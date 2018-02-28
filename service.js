@@ -22,7 +22,7 @@ const servicePromise = async () => {
 };
 
 if (process.env.NODE_ENV === 'test') { // mocha
-	setSessionStorage(new FileStorage('./sessions/'));
+	setSessionStorage(new FileStorage('./test/sessions/'));
 	module.exports = servicePromise;
 } else {
 	setSessionStorage(new FileStorage('./sessions/'));
