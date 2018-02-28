@@ -23,7 +23,7 @@ describe('session tests', () => {
 		});
 	});
 	it('it should load old session', (done) => {
-		Session.load(sessions[1].id).then((ses) => {
+		Session.load(sessions[1].id).then( (ses) => {
 			expect(ses.get('test')).to.be.a('string');
 			done();
 		});

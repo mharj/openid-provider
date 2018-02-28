@@ -1,6 +1,5 @@
-const fs = require('fs');
 const uuid = require('uuid/v1');
-const path = './sessions/';
+const {getSessionStorage} = require('./storage');
 
 class Session {
 	constructor() {
@@ -14,44 +13,22 @@ class Session {
 		return this.data[key];
 	};
 	save() {
-		return new Promise( (resolve, reject) => {
-			fs.writeFile(path+this.id+'.json', JSON.stringify(this.data), (err) => {
-				if ( err ) {
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-		});
+		let storage = getSessionStorage();
+		return storage.save(this.id, this.data );
 	};
 	delete() {
-		if ( fs.existsSync(path+this.id+'.json') ) {
-			return new Promise( (resolve, reject) => {
-				fs.unlink(path+this.id+'.json', (err) => {
-					if ( err ) {
-						reject(err);
-					} else {
-						resolve();
-					}
-				});
-			});
-		} else {
-			return Promise.resolve();
-		}
+		let storage = getSessionStorage();
+		return storage.delete(this.id);
 	}
 }
 Session.load = function(id) {
-	return new Promise( (resolve, reject) => {
-		let c = new Session();
-		fs.readFile(path+id+'.json', (err, data) => {
-			if ( err ) {
-				reject(err);
-			} else {
-				c.id = id;
-				c.data = JSON.parse(data);
-				resolve(c);
-			}
+	let storage = getSessionStorage();
+	return storage.load(id)
+		.then( (data) => {
+			let c = new Session();
+			c.id = id;
+			c.data = data;
+			return Promise.resolve(c);
 		});
-	});
 };
 module.exports = Session;

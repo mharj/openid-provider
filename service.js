@@ -7,6 +7,8 @@ const port = process.env.PORT || '7957';
 const discovery = require('./routes/discovery');
 const oauth2 = require('./routes/oauth2');
 const {loadCerts} = require('./modules/cert');
+const {setSessionStorage} = require('./modules/storage');
+const FileStorage = require('./modules/storages/file');
 
 app.get('/', (req, res) => res.send('Hello World!'));
 app.use('/.well-known/openid-configuration', discovery);
@@ -20,8 +22,10 @@ const servicePromise = async () => {
 };
 
 if (process.env.NODE_ENV === 'test') { // mocha
+	setSessionStorage(new FileStorage('./sessions/'));
 	module.exports = servicePromise;
 } else {
+	setSessionStorage(new FileStorage('./sessions/'));
 	servicePromise()
 		.then( () => {
 			app.listen(port, () => console.log('OpenID provider running on ' + port));
