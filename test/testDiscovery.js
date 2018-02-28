@@ -1,12 +1,21 @@
 process.env.NODE_ENV = 'test';
 let chai = require('chai');
 let chaiHttp = require('chai-http');
-let service = require('../service');
+let servicePromise = require('../service');
+let service = null;
 chai.should();
 chai.use(chaiHttp);
 
 
 describe('GET /.well-known/openid-configuration', () => {
+	before( function(done) {
+		this.timeout(5000);
+		servicePromise()
+			.then( (s) => {
+				service = s;
+				done();
+			});
+	});
 	it('it should GET OpenID config', (done) => {
 		chai.request(service)
 			.get('/.well-known/openid-configuration')

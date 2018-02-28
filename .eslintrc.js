@@ -5,6 +5,13 @@ module.exports = {
 		node: true,
 		mocha: true,
 	},
+	parserOptions: {
+		ecmaVersion: 8,
+		ecmaFeatures: {
+			experimentalObjectRestSpread: true,
+		},
+		sourceType: 'module',
+	},
 	rules: {
 		'require-jsdoc': 0,
 		indent: ['error', 'tab', {SwitchCase: 1}],

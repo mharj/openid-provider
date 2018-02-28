@@ -23,7 +23,7 @@ function discovery(req, res) {
 	res.set('Content-Type', 'application/json');
 	res.set('Access-Control-Allow-Origin', '*');
 	res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-	res.set('Access-Control-Allow-Headers', 'ETag, Content-Type');
+	res.set('Access-Control-Allow-Headers', 'If-None-Match, Content-Type');
 	res.set('Access-Control-Max-Age', '86400');
 	res.set('Access-Control-Expose-Headers', 'ETag, Content-Type');
 	res.set('ETag', etag(data));

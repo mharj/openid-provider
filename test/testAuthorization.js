@@ -4,8 +4,8 @@ const {expect} = require('chai');
 const url = require('url');
 let chaiHttp = require('chai-http');
 const querystring = require('querystring');
-let service = require('../service');
-
+let servicePromise = require('../service');
+let service = null;
 chai.should();
 chai.use(chaiHttp);
 
@@ -31,6 +31,14 @@ function getConfig() {
 }
 
 describe('authorization_endpoint', () => {
+	before( function(done) {
+		this.timeout(5000);
+		servicePromise()
+			.then( (s) => {
+				service = s;
+				done();
+			});
+	});
 	it('it should get error redirect if dont have needed openid parameters', (done) => {
 		getConfig().then((config) => {
 			let urlData = url.parse(config['authorization_endpoint']);
@@ -122,10 +130,22 @@ describe('authorization_endpoint', () => {
 				.redirects(0)
 				.set('Authorization', 'Basic ' + new Buffer('test:test').toString('base64'))
 				.then((res) => {
-					done();
+					done(new Error('This should be broken'));
 				})
 				.catch((err) => {
-					done(err);
+					if (err.status === 302) {
+						let [redirectUri, queryString] = err.response.headers.location.split('?', 2);
+						let data = querystring.parse(queryString);
+						expect(data).not.to.have.property('error');
+						expect(data).not.to.have.property('error_description');
+						expect(redirectUri).to.be.equal(params['redirect_uri']);
+						expect(data).to.have.property('session_state');
+						expect(data).to.have.property('code');
+						expect(data).to.have.property('state');
+						done();
+					} else {
+						done(err);
+					}
 				});
 		});
 	});
@@ -228,6 +248,27 @@ describe('authorization_endpoint', () => {
 					} else {
 						done(err);
 					}
+				});
+		});
+	});
+	it('test code flow', (done) => {
+		getConfig().then((config) => {
+			let urlData = url.parse(config['authorization_endpoint']);
+			let flowData = Object.assign({}, params, {response_type: 'code'});
+			chai
+				.request(service)
+				.post(urlData.path + '?' + querystring.stringify(flowData))
+				.redirects(0)
+				.type('json')
+				.send({
+					username: 'test',
+					password: 'test',
+				})
+				.then((res) => {
+					done();
+				})
+				.catch((err) => {
+					done(err);
 				});
 		});
 	});

@@ -2,7 +2,12 @@ const fs = require('fs');
 const crypto = require('crypto');
 const pem2jwk = require('pem-jwk').pem2jwk;
 
-module.exports.loadCerts = (certs) => {
+let certList = [];
+module.exports.getCerts = () => {
+	return certList;
+};
+
+module.exports.loadCerts = () => {
 	return new Promise((resolve, reject) => {
 		let path;
 		if (process.env.NODE_ENV === 'test') {
@@ -14,7 +19,7 @@ module.exports.loadCerts = (certs) => {
 			// get *.pub files to jwt list
 			files.filter((file) => file.match(/\.pub$/)).forEach((file) => {
 				let pubCert = fs.readFileSync(path + file, 'ascii');
-				certs.push(
+				certList.push(
 					Object.assign({}, pem2jwk(pubCert), {
 						alg: 'RS256',
 						use: 'sig',

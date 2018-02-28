@@ -45,3 +45,24 @@ module.exports.getClient = (id) => {
 		resolve(client);
 	});
 };
+
+let sessionData = [];
+let codeIndex = {};
+let idTokenIndex = {};
+
+module.exports.loadSessionData = () => {
+	return new Promise((resolve, reject) => {
+		// TODO: BUILD
+	});
+};
+
+module.exports.getWithAuthCode = (code) => {
+	return new Promise((resolve, reject) => {
+		// TODO: BUILD
+	});
+};
+module.exports.getWithIdToken = (idToken) => {
+	return new Promise((resolve, reject) => {
+		// TODO: BUILD
+	});
+};

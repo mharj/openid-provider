@@ -3,10 +3,10 @@ let chai = require('chai');
 const {expect} = require('chai');
 const url = require('url');
 let chaiHttp = require('chai-http');
-let service = require('../service');
+let servicePromise = require('../service');
+let service = null;
 chai.should();
 chai.use(chaiHttp);
-
 
 let configCache = null;
 function getConfig() {
@@ -24,7 +24,11 @@ function getConfig() {
 describe('jwks_uri endpoint', () => {
 	before( function(done) {
 		this.timeout(5000);
-		setTimeout(done, 2000); // wait server to load certs
+		servicePromise()
+			.then( (s) => {
+				service = s;
+				done();
+			});
 	});
 	it('it should GET JWT cert list', (done) => {
 		getConfig().then((config) => {
