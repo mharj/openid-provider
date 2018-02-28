@@ -59,4 +59,3 @@ typings/
 
 # ignore cert Directory
 /jwtcerts/
-/test/jwtcerts/
