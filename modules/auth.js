@@ -1,13 +1,11 @@
-function auth() {}
-
-module.exports = auth;
+const Session = require('./session');
 
 module.exports.checkPassword = (username, password) => {
 	return new Promise((resolve, reject) => {
 		if (process.env.NODE_ENV === 'test') {
 			// mocha
 			if (username === 'test' && password === 'test') {
-				resolve();
+				resolve({upn: username+'@'+'localhost', name: 'Unit test'});
 				return;
 			}
 		} else {
@@ -52,17 +50,44 @@ let idTokenIndex = {};
 
 module.exports.loadSessionData = () => {
 	return new Promise((resolve, reject) => {
-		// TODO: BUILD
+		Session.list()
+			.then( (sessions) => {
+				sessionData = sessions;
+				let cIndex = {};
+				let tIndex = {};
+				sessions.forEach( (ses) => {
+					let code = ses.get('code');
+					let itToken = ses.get('id_token');
+					if ( code ) {
+						cIndex[code] = ses;
+					}
+					if ( itToken ) {
+						tIndex[itToken] = ses;
+					}
+				});
+				codeIndex = cIndex;
+				idTokenIndex = tIndex;
+				resolve();
+			});
 	});
 };
 
 module.exports.getWithAuthCode = (code) => {
 	return new Promise((resolve, reject) => {
-		// TODO: BUILD
+		if ( codeIndex[code] ) {
+			resolve(codeIndex[code]);
+		} else {
+			reject(new Error('No Session'));
+		}
 	});
 };
+
 module.exports.getWithIdToken = (idToken) => {
 	return new Promise((resolve, reject) => {
-		// TODO: BUILD
+		if ( idTokenIndex[idToken] ) {
+			resolve(idTokenIndex[idToken]);
+		} else {
+			reject(new Error('No Session'));
+		}
 	});
 };
